@@ -1,51 +1,114 @@
-# React + TypeScript + Vite
+# Shop.co - React E-commerce Platform
+A modern e-commerce platform built with React + TypeScript, featuring a responsive design with Tailwind CSS and comprehensive shopping features.
+## 🛠️ Tech Stack
+* React 18
+* TypeScript
+* Tailwind CSS
+* React Router DOM
+* Axios
+* Lucide React (for icons)
+  
+## 📋 Prerequisites
+* Node.js (v16.0.0 or higher)
+* npm (v8.0.0 or higher)
+* Git
+  
+## 🚀 Installation & Setup
+1. Clone the repository:
+   ```bash
+git clone https://github.com/yourusername/shop-co-ecommerce.git
+cd shop-co-ecommerce
+```
+2. Install dependencies:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  ```bash
+npm install react-router-dom @types/react-router-dom
+npm install tailwindcss postcss autoprefixer
+npm install axios
+npm install lucide-react
+```
+3.Initialize Tailwind CSS:
+```bash
+npx tailwindcss init -p
+```
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
+4. Configure Tailwind CSS
+    ```bash
+    (tailwind.config.js):
+    ```
+ ```bash
+    module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'blue': {
+          500: '#3B82F6',
+          600: '#2563EB',
+          900: '#1E3A8A',
+        },
+        'gray': {
+          400: '#9CA3AF',
+          700: '#374151',
+          900: '#111827',
+        }
+      }
     },
   },
-})
+  plugins: [],
+}
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+## 📁 Project Structure
+  ```bash
+shop-co/
+├── src/
+│   ├── assets/
+│   │   └── bannerImage.jpg
+│   ├── components/
+│   │   ├── Banner.tsx
+│   │   └── Footer.tsx
+│   ├── api/
+│   │   └── axios.ts        # Axios configuration
+│   ├── types/
+│   │   └── index.ts        # TypeScript interfaces
+│   ├── pages/
+│   │   ├── Home.tsx
+│   │   ├── Shop.tsx
+│   │   ├── About.tsx
+│   │   ├── Features.tsx
+│   │   ├── Career.tsx
+│   │   └── Support/
+│   │       ├── CustomerSupport.tsx
+│   │       ├── DeliveryDetails.tsx
+│   │       ├── Terms.tsx
+│   │       └── Privacy.tsx
+│   ├── App.tsx
+│   └── index.tsx
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
-# ecommerce
+## ⚙️ Component Setup
+# Banner Component
+// Required imports
+ ```bash
+import { Link } from 'react-router-dom';
+import bannerImage from '../assets/bannerImage.jpg';
+```
+# Key features:
+* Full-width banner with background image
+* Responsive text layout
+* Call-to-action button linking to shop
+  
+## Footer Component
+ ```bash
+// Required imports
+import { Link } from 'react-router-dom';
+```
+## 🚀 Running the Project
+ ```bash
+npm run dev
+ ```
