@@ -1,8 +1,9 @@
-//pages/Cart.tsx
+// pages/Cart.tsx
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Star } from 'lucide-react';
 
 const Cart = () => {
     const {
@@ -13,6 +14,34 @@ const Cart = () => {
         getDiscount,
         getCartTotal
     } = useCart();
+
+    // Helper function to generate consistent ratings
+    const generateRating = (id: number) => {
+        const baseRating = ((id * 7) % 25 + 35) / 10;
+        return {
+            rate: parseFloat(baseRating.toFixed(1)),
+            count: ((id * 13) % 200) + 50
+        };
+    };
+
+    // Star rating component
+    const StarRating = ({ rating }: { rating: number }) => {
+        return (
+            <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                        key={star}
+                        size={16}
+                        className={`${star <= rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300'
+                            }`}
+                    />
+                ))}
+                <span className="ml-1 text-sm text-gray-600">({rating})</span>
+            </div>
+        );
+    };
 
     // Calculate line total for each item
     const getLineTotal = (price: number, quantity: number) => {
@@ -34,53 +63,59 @@ const Cart = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Cart Items */}
                     <div className="lg:col-span-2 space-y-6">
-                        {cart.map((item) => (
-                            <div key={item.id} className="flex gap-4 bg-white p-4 rounded-lg">
-                                <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="w-24 h-24 object-contain"
-                                />
-                                <div className="flex-1">
-                                    <div className="flex justify-between">
-                                        <h3 className="font-medium">{item.title}</h3>
-                                        <button
-                                            onClick={() => removeFromCart(item.id)}
-                                            className="text-red-500"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                    <p className="text-sm text-gray-500">Size: {item.size}</p>
-                                    <p className="text-sm text-gray-500">Color: Default</p>
-                                    <div className="flex justify-between items-center mt-4">
-                                        <div className="flex items-center gap-2">
+                        {cart.map((item) => {
+                            const rating = generateRating(item.id);
+                            return (
+                                <div key={item.id} className="flex gap-4 bg-white p-4 rounded-lg">
+                                    <img
+                                        src={item.images[0]}
+                                        alt={item.title}
+                                        className="w-24 h-24 object-contain"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex justify-between">
+                                            <h3 className="font-medium">{item.title}</h3>
                                             <button
-                                                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                                className="w-8 h-8 border rounded-md flex items-center justify-center"
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="text-red-500"
                                             >
-                                                -
-                                            </button>
-                                            <span>{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="w-8 h-8 border rounded-md flex items-center justify-center"
-                                            >
-                                                +
+                                                ✕
                                             </button>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="font-bold">${item.price} each</div>
-                                            {item.quantity > 1 && (
-                                                <div className="text-sm text-gray-600">
-                                                    Subtotal: ${getLineTotal(item.price, item.quantity).toFixed(2)}
-                                                </div>
-                                            )}
+                                        <div className="mt-1">
+                                            <StarRating rating={rating.rate} />
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-2">Size: {item.size}</p>
+                                        <p className="text-sm text-gray-500">Color: Default</p>
+                                        <div className="flex justify-between items-center mt-4">
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                                    className="w-8 h-8 border rounded-md flex items-center justify-center"
+                                                >
+                                                    -
+                                                </button>
+                                                <span>{item.quantity}</span>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    className="w-8 h-8 border rounded-md flex items-center justify-center"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-bold">${item.price} each</div>
+                                                {item.quantity > 1 && (
+                                                    <div className="text-sm text-gray-600">
+                                                        Subtotal: ${getLineTotal(item.price, item.quantity).toFixed(2)}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Order Summary */}
@@ -128,5 +163,5 @@ const Cart = () => {
         </div>
     );
 };
-
 export default Cart;
+

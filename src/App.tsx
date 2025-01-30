@@ -20,17 +20,7 @@ function App() {
             <Route path="/search" element={<SearchResults />} />
 
             {/* Category Routes */}
-            <Route path="/category/men" element={<CategoryPage />} />
-            <Route path="/category/men/:subCategory" element={<CategoryPage />} />
-
-            <Route path="/category/women" element={<CategoryPage />} />
-            <Route path="/category/women/:subCategory" element={<CategoryPage />} />
-
-            <Route path="/category/electronics" element={<CategoryPage />} />
-            <Route path="/category/electronics/:subCategory" element={<CategoryPage />} />
-
-            <Route path="/category/jewelery" element={<CategoryPage />} />
-            <Route path="/category/jewelery/:subCategory" element={<CategoryPage />} />
+            <Route path="/category/:category" element={<CategoryPage />} />
 
             {/* Additional Routes */}
             <Route path="/shop" element={<CategoryPage />} />

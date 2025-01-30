@@ -1,9 +1,10 @@
+//pages/ProductDetail.tsx
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Check } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
 import axios from 'axios';
 import { Product } from '../api';
 
@@ -13,21 +14,50 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState('Medium');
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState('olive');
+    const [selectedColor, setSelectedColor] = useState('Default');
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const { addToCart } = useCart();
 
-    // Define colors available
+    // Define colors available - you can modify these as needed
     const colors = [
-        { name: 'olive', hex: '#556B2F' },
-        { name: 'teal', hex: '#1A4B4B' },
-        { name: 'navy', hex: '#1B1B3A' }
+        { name: 'Default', hex: '#556B2F' },
+        { name: 'Alternative', hex: '#1A4B4B' },
     ];
+
+    // Helper function to generate consistent ratings
+    const generateRating = (id: number) => {
+        const baseRating = ((id * 7) % 25 + 35) / 10; // Generates ratings between 3.5 and 5.0
+        return {
+            rate: parseFloat(baseRating.toFixed(1)),
+            count: ((id * 13) % 200) + 50 // Generates review counts between 50 and 250
+        };
+    };
+
+    // Star rating component
+    const StarRating = ({ rating }: { rating: number }) => {
+        return (
+            <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                        key={star}
+                        size={20}
+                        className={`${star <= rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300'
+                            }`}
+                    />
+                ))}
+                <span className="ml-2 text-sm text-gray-600">
+                    ({rating} / 5) · {generateRating(Number(id)).count} reviews
+                </span>
+            </div>
+        );
+    };
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`https://fakestoreapi.com/products/${id}`);
+                const response = await axios.get(`https://api.escuelajs.co/api/v1/products/${id}`);
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -55,8 +85,7 @@ const ProductDetail = () => {
         );
     }
 
-    // Create image variations array
-    const imageVariations = [product.image, product.image, product.image];
+    const rating = generateRating(product.id);
 
     return (
         <div>
@@ -68,9 +97,11 @@ const ProductDetail = () => {
                     <span>/</span>
                     <Link to="/shop" className="hover:text-gray-700">Shop</Link>
                     <span>/</span>
-                    <Link to="/shop/men" className="hover:text-gray-700">Men</Link>
+                    <Link to={`/category/${product.category.id}`} className="hover:text-gray-700">
+                        {product.category.name}
+                    </Link>
                     <span>/</span>
-                    <span className="text-gray-900">T-shirts</span>
+                    <span className="text-gray-900">{product.title}</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -78,7 +109,7 @@ const ProductDetail = () => {
                     <div className="flex gap-4">
                         {/* Vertical Thumbnails */}
                         <div className="flex flex-col gap-4">
-                            {imageVariations.map((img, index) => (
+                            {product.images.map((img, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setSelectedImageIndex(index)}
@@ -88,7 +119,11 @@ const ProductDetail = () => {
                                     <img
                                         src={img}
                                         alt={`${product.title} view ${index + 1}`}
-                                        className="w-full h-full object-contain"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = 'https://placehold.co/300x300/EEE/31343C?text=Product';
+                                        }}
                                     />
                                 </button>
                             ))}
@@ -97,47 +132,40 @@ const ProductDetail = () => {
                         {/* Main Image */}
                         <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden">
                             <img
-                                src={imageVariations[selectedImageIndex]}
+                                src={product.images[selectedImageIndex]}
                                 alt={product.title}
                                 className="w-full h-[500px] object-contain transform transition-transform duration-300 hover:scale-110"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://via.placeholder.com/300';
+                                }}
                             />
                         </div>
                     </div>
 
                     {/* Product Details */}
                     <div className="space-y-6">
-                        <h1 className="text-3xl font-bold">ONE LIFE GRAPHIC T-SHIRT</h1>
+                        <h1 className="text-3xl font-bold">{product.title}</h1>
 
-                        {/* Rating */}
-                        <div className="flex items-center gap-2">
-                            <div className="flex">
-                                {[...Array(5)].map((_, i) => (
-                                    <span
-                                        key={i}
-                                        className={`text-xl ${i < Math.round(product.rating.rate)
-                                            ? 'text-yellow-400'
-                                            : 'text-gray-300'
-                                            }`}
-                                    >
-                                        ★
-                                    </span>
-                                ))}
-                            </div>
-                            <span className="text-sm text-gray-600">
-                                {product.rating.rate}/5
-                            </span>
+                        {/* Rating Stars */}
+                        <div className="mb-4">
+                            <StarRating rating={rating.rate} />
+                        </div>
+
+                        {/* Category */}
+                        <div className="text-gray-600">
+                            Category: {product.category.name}
                         </div>
 
                         {/* Price */}
                         <div className="flex items-center gap-3">
-                            <span className="text-2xl font-bold">$260</span>
-                            <span className="text-xl text-gray-400 line-through">$300</span>
-                            <span className="text-red-500 text-sm">-40%</span>
+                            <span className="text-2xl font-bold">
+                                ${product.price.toFixed(2)}
+                            </span>
                         </div>
 
                         <p className="text-gray-600">
-                            This graphic t-shirt which is perfect for any occasion. Crafted from a soft and
-                            breathable fabric, it offers superior comfort and style.
+                            {product.description}
                         </p>
 
                         {/* Color Selection */}

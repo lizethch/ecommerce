@@ -1,4 +1,4 @@
-//pages/SearchResults.tsx
+// pages/SearchResults.tsx
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useLocation } from 'react-router-dom';
@@ -14,7 +14,7 @@ const SearchResults = () => {
     const filteredProducts = products.filter(product =>
         product.title.toLowerCase().includes(query.toLowerCase()) ||
         product.description.toLowerCase().includes(query.toLowerCase()) ||
-        product.category.toLowerCase().includes(query.toLowerCase())
+        product.category.name.toLowerCase().includes(query.toLowerCase())
     );
 
     return (
@@ -34,7 +34,7 @@ const SearchResults = () => {
                             <Link to={`/product/${product.id}`}>
                                 <div className="h-64 overflow-hidden">
                                     <img
-                                        src={product.image}
+                                        src={product.images[0]}
                                         alt={product.title}
                                         className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                                     />
@@ -45,7 +45,9 @@ const SearchResults = () => {
                                         <span className="text-xl font-bold">${product.price}</span>
                                         <div className="flex items-center">
                                             <span className="text-yellow-400 mr-1">★</span>
-                                            <span className="text-gray-600">{product.rating.rate}</span>
+                                            <span className="text-gray-600">
+                                                {product.rating?.rate || 'N/A'}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

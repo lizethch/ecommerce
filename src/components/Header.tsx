@@ -1,9 +1,19 @@
-import { useState } from 'react';
+//components/Header.tsx
+import { useState, } from 'react';
 import { CartIcon } from '../assets/icons/CartIcon';
 import { ProfileIcon } from '../assets/icons/ProfileIcon';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { Menu, X, Search, ChevronDown } from 'lucide-react';
+
+// Define allowed categories
+const ALLOWED_CATEGORIES = [
+    'Clothes',
+    'Electronics',
+    'Furniture',
+    'Shoes',
+    'Miscellaneous'
+];
 
 const Header = () => {
     const navigate = useNavigate();
@@ -12,36 +22,6 @@ const Header = () => {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-
-    const categories = {
-        category: {
-            label: "Categories",
-            subcategories: [
-                {
-                    label: "Men",
-                    subItems: [
-                        { label: 'Casual', path: '/category/men/casual' },
-                        { label: 'Formal', path: '/category/men/formal' }
-                    ]
-                },
-                {
-                    label: "Women",
-                    subItems: [
-                        { label: 'Casual', path: '/category/women/casual' },
-                        { label: 'Formal', path: '/category/women/formal' },
-                        { label: 'Jewelry', path: '/category/women/jewelry' }
-                    ]
-                },
-                {
-                    label: "Electronics",
-                    subItems: [
-                        { label: 'Gadgets', path: '/category/electronics/gadgets' },
-                        { label: 'Tech', path: '/category/electronics/tech' }
-                    ]
-                }
-            ]
-        }
-    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,6 +41,12 @@ const Header = () => {
     };
 
     const handleDropdownLeave = () => {
+        setActiveDropdown(null);
+    };
+
+    const handleCategoryClick = (category: string) => {
+        navigate(`/category/${category.toLowerCase()}`);
+        setIsMobileMenuOpen(false);
         setActiveDropdown(null);
     };
 
@@ -92,43 +78,30 @@ const Header = () => {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:block">
                         <ul className="flex space-x-8">
-                            {Object.entries(categories).map(([key, category]) => (
-                                <li
-                                    key={key}
-                                    className="relative"
-                                    onMouseEnter={() => handleDropdownEnter(key)}
-                                    onMouseLeave={handleDropdownLeave}
-                                >
-                                    <button className="flex items-center gap-1 hover:text-gray-600">
-                                        {category.label}
-                                        <ChevronDown size={16} />
-                                    </button>
+                            <li
+                                className="relative"
+                                onMouseEnter={() => handleDropdownEnter('categories')}
+                                onMouseLeave={handleDropdownLeave}
+                            >
+                                <button className="flex items-center gap-1 hover:text-gray-600">
+                                    Categories
+                                    <ChevronDown size={16} />
+                                </button>
 
-                                    {activeDropdown === key && (
-                                        <div className="absolute top-full left-0 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-                                            {category.subcategories.map((subCat) => (
-                                                <div key={subCat.label} className="group relative">
-                                                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center justify-between">
-                                                        {subCat.label}
-                                                        <ChevronDown size={16} className="-rotate-90" />
-                                                    </button>
-                                                    <div className="absolute left-full top-0 w-48 bg-white shadow-lg rounded-md py-2 hidden group-hover:block">
-                                                        {subCat.subItems.map((item) => (
-                                                            <Link
-                                                                key={item.path}
-                                                                to={item.path}
-                                                                className="block px-4 py-2 hover:bg-gray-100"
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </li>
-                            ))}
+                                {activeDropdown === 'categories' && (
+                                    <div className="absolute top-full left-0 w-48 bg-white shadow-lg rounded-md py-2 z-50">
+                                        {ALLOWED_CATEGORIES.map((category) => (
+                                            <button
+                                                key={category}
+                                                onClick={() => handleCategoryClick(category)}
+                                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </li>
                             <li><Link to="/sale" className="hover:text-gray-600">Sale</Link></li>
                             <li><Link to="/new-arrivals" className="hover:text-gray-600">New Arrivals</Link></li>
                         </ul>
@@ -174,54 +147,34 @@ const Header = () => {
             {isMobileMenuOpen && (
                 <nav className="md:hidden border-t pt-4">
                     <ul className="space-y-4 px-4">
-                        {Object.entries(categories).map(([key, category]) => (
-                            <li key={key} className="space-y-2">
-                                <button
-                                    className="flex items-center justify-between w-full"
-                                    onClick={() => setActiveDropdown(activeDropdown === key ? null : key)}
-                                >
-                                    {category.label}
-                                    <ChevronDown
-                                        size={16}
-                                        className={`transform transition-transform ${activeDropdown === key ? 'rotate-180' : ''}`}
-                                    />
-                                </button>
+                        <li className="space-y-2">
+                            <button
+                                className="flex items-center justify-between w-full"
+                                onClick={() => setActiveDropdown(activeDropdown === 'categories' ? null : 'categories')}
+                            >
+                                Categories
+                                <ChevronDown
+                                    size={16}
+                                    className={`transform transition-transform ${activeDropdown === 'categories' ? 'rotate-180' : ''
+                                        }`}
+                                />
+                            </button>
 
-                                {activeDropdown === key && (
-                                    <ul className="pl-4 space-y-2">
-                                        {category.subcategories.map((subCat) => (
-                                            <li key={subCat.label} className="space-y-2">
-                                                <button
-                                                    className="flex items-center justify-between w-full"
-                                                    onClick={() => setActiveDropdown(activeDropdown === subCat.label ? null : subCat.label)}
-                                                >
-                                                    {subCat.label}
-                                                    <ChevronDown
-                                                        size={16}
-                                                        className={`transform transition-transform ${activeDropdown === subCat.label ? 'rotate-180' : ''}`}
-                                                    />
-                                                </button>
-                                                {activeDropdown === subCat.label && (
-                                                    <ul className="pl-4 space-y-2">
-                                                        {subCat.subItems.map((item) => (
-                                                            <li key={item.path}>
-                                                                <Link
-                                                                    to={item.path}
-                                                                    className="block py-1 text-gray-600 hover:text-gray-900"
-                                                                    onClick={toggleMobileMenu}
-                                                                >
-                                                                    {item.label}
-                                                                </Link>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </li>
-                        ))}
+                            {activeDropdown === 'categories' && (
+                                <ul className="pl-4 space-y-2">
+                                    {ALLOWED_CATEGORIES.map((category) => (
+                                        <li key={category}>
+                                            <button
+                                                onClick={() => handleCategoryClick(category)}
+                                                className="block py-2 text-gray-600 hover:text-gray-900 w-full text-left"
+                                            >
+                                                {category}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </li>
                         <li><Link to="/sale" className="block hover:text-gray-600">Sale</Link></li>
                         <li><Link to="/new-arrivals" className="block hover:text-gray-600">New Arrivals</Link></li>
                     </ul>
